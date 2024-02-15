@@ -1,0 +1,49 @@
+/* You can add global styles to this file, and also import other style files */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .sx {
+    @apply text-sm font-mono py-4;
+
+    code {
+      @apply w-full block;
+
+      .line {
+        @apply px-4 w-full inline-block leading-6;
+      }
+    }
+  }
+
+  .sx-h {
+    @apply bg-white/10;
+  }
+
+  .sx-d-a {
+    @apply bg-red-500/10 text-red-500/75;
+  }
+
+  .sx-d-r {
+    @apply bg-green-500/10 text-green-500/75;
+  }
+
+  .sx-d-p {
+    .sx-d-a:before, .sx-d-r:before  {
+      @apply -ml-4 pl-2;
+    }
+
+    .sx-d-a:before {
+      @apply content-['+'];
+    }
+
+    .sx-d-r:before {
+      @apply content-['-'];
+    }
+  }
+
+  .sx-w {
+    @apply bg-white/10 border-white/10 border px-1 -mx-1;
+  }
+}
