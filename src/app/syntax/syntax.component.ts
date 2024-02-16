@@ -1,11 +1,18 @@
 import {Component, OnInit} from '@angular/core';
-import {addClassToHast, CodeToHastOptions, getHighlighterCore} from "shiki";
+import {
+  addClassToHast,
+  CodeToHastOptions,
+  getHighlighterCore,
+} from "shiki/bundle/web";
+import vitesseLightTheme from 'shiki/themes/vitesse-light.mjs';
+import tsxLang from 'shiki/langs/tsx.mjs';
 import {
   transformerNotationDiff,
   transformerNotationHighlight,
-  transformerNotationWordHighlight
+  transformerNotationWordHighlight,
 } from "@shikijs/transformers";
 import getWasm from 'shiki/wasm'
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-syntax',
@@ -13,10 +20,12 @@ import getWasm from 'shiki/wasm'
   template: `<div [innerHTML]="code"></div>`
 })
 export class SyntaxComponent implements OnInit {
-  code = '';
+  private static theme = "vitesse-light";
+  private static language = 'tsx';
+  code: SafeHtml = '';
   config: CodeToHastOptions = {
-    lang: 'tsx',
-    theme: 'material-theme-ocean',
+    lang: SyntaxComponent.language,
+    theme: SyntaxComponent.theme,
     transformers: [
       {
         pre(node) {
@@ -42,15 +51,17 @@ export class SyntaxComponent implements OnInit {
     }
   `;
 
+  constructor(private sanitizer:DomSanitizer) {}
 
   async ngOnInit() {
     const highlighter = await getHighlighterCore({
-      themes: [() => import('shiki/themes/material-theme-ocean.mjs')],
-      langs: [() => import('shiki/langs/tsx.mjs')],
-      loadWasm: getWasm
-    })
+      langs: [tsxLang],
+      themes: [vitesseLightTheme],
+      loadWasm: getWasm,
+    });
+
     try {
-      this.code = await highlighter.codeToHtml(this.example, this.config);
+      this.code = this.sanitizer.bypassSecurityTrustHtml(highlighter.codeToHtml(this.example, this.config));
     } catch (e) {
       if (typeof e === 'string') {
         new Error(e);
